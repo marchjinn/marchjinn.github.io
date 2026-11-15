@@ -1,3 +1,4 @@
+
 ---
 import { ClientRouter } from "astro:transitions";
 import GlobalNav from "../components/GlobalNav.astro";
@@ -12,8 +13,13 @@ const {
   title,
   description = "March Jinn Official Website"
 } = Astro.props;
-const pageTitle = title === "March Jinn" ? title : `${title} — March Jinn`;
+
+const pageTitle =
+  title === "March Jinn" ? title : `${title} — March Jinn`;
+
+const canonicalUrl = `https://marchjinn.com${Astro.url.pathname}`;
 ---
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -21,21 +27,28 @@ const pageTitle = title === "March Jinn" ? title : `${title} — March Jinn`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#080808" />
     <meta name="description" content={description} />
+
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={`https://marchjinn.com${Astro.url.pathname}`} />
+    <meta property="og:url" content={canonicalUrl} />
+
+    <link rel="canonical" href={canonicalUrl} />
+
     <title>{pageTitle}</title>
+
     <ClientRouter />
   </head>
+
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-header">
-      <a class="wordmark" href="/zillion/" aria-label="March Jinn — Zillion">March Jinn</a>
-    </header>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+
     <main id="main" class="page-shell">
       <slot />
     </main>
+
     <GlobalNav />
   </body>
 </html>
