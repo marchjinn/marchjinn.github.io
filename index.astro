@@ -1,14 +1,92 @@
 
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
+import CatalogSection from "../components/CatalogSection.astro";
+
+const musicSections = [
+  {
+    title: "Releases",
+    collections: [
+      { title: "Albums", format: "square" },
+      { title: "Singles", format: "square" },
+      { title: "Appears On", format: "square" }
+    ]
+  },
+  {
+    title: "Lives",
+    collections: [
+      { title: "Tours", format: "wide" },
+      { title: "Festivals", format: "wide" },
+      { title: "Specials", format: "wide" }
+    ]
+  },
+  {
+    title: "Credits",
+    collections: [
+      { title: "Artist", format: "square" },
+      { title: "Producer", format: "square" },
+      { title: "Other", format: "square" }
+    ]
+  }
+];
+
+const mediaSections = [
+  {
+    title: "Videos",
+    collections: [
+      { title: "Music Videos", format: "wide" },
+      { title: "Films", format: "wide" },
+      { title: "Vlogs", format: "wide" },
+      { title: "Interviews", format: "wide" },
+      { title: "Shows", format: "wide" },
+      { title: "Performances", format: "wide" }
+    ]
+  },
+  {
+    title: "Photos",
+    collections: [
+      { title: "Portraits", format: "portrait" },
+      { title: "Editorials", format: "portrait" },
+      { title: "Campaigns", format: "portrait" },
+      { title: "Performances", format: "portrait" },
+      { title: "Events", format: "portrait" },
+      { title: "Lifestyle", format: "portrait" }
+    ]
+  },
+  {
+    title: "Audios",
+    collections: [
+      { title: "Podcasts", format: "square" },
+      { title: "Interviews", format: "square" },
+      { title: "Broadcasts", format: "square" }
+    ]
+  },
+  {
+    title: "Streams",
+    collections: [
+      { title: "Screen Streams", format: "wide" },
+      { title: "IRL Streams", format: "wide" },
+      { title: "Performances", format: "wide" },
+      { title: "Shows", format: "wide" },
+      { title: "Specials", format: "wide" }
+    ]
+  },
+  {
+    title: "Publications",
+    collections: [
+      { title: "Posts", format: "portrait" },
+      { title: "Articles", format: "portrait" },
+      { title: "News", format: "portrait" },
+      { title: "Reviews", format: "portrait" },
+      { title: "Interviews", format: "portrait" },
+      { title: "Features", format: "portrait" }
+    ]
+  }
+];
 
 const domains = [
   { id: "music", label: "Music" },
-  { id: "media", label: "Media" },
-  { id: "fashion", label: "Fashion" },
-  { id: "beauty", label: "Beauty" },
-  { id: "food-beverage", label: "Food & Beverage" },
-  { id: "technology", label: "Technology" }
+  { id: "media", label: "Media" }
 ];
 ---
 
@@ -16,23 +94,169 @@ const domains = [
   title="March Jinn"
   description="March Jinn Official Website"
 >
-  <section class="platform-home" aria-label="March Jinn Digital Platform">
-    <div class="platform-home__intro">
-      <p class="eyebrow">March Jinn</p>
-      <h1>March Jinn</h1>
-    </div>
+  <div class="domain-environment">
 
-    <nav class="domain-selector" aria-label="Explore March Jinn">
-      {domains.map((domain) => (
-        <button
-          class="domain-selector__item"
-          type="button"
-          data-domain={domain.id}
-          aria-pressed={domain.id === "music" ? "true" : "false"}
-        >
-          {domain.label}
-        </button>
-      ))}
-    </nav>
-  </section>
+    <section
+      class="domain-panel"
+      data-domain-panel="music"
+      aria-labelledby="music-title"
+    >
+      <header class="domain-heading">
+        <p class="eyebrow">March Jinn / Domain 01</p>
+        <h1 id="music-title">Music</h1>
+      </header>
+
+      <div class="domain-catalog">
+        {musicSections.map((section) => (
+          <CatalogSection
+            title={section.title}
+            collections={section.collections}
+          />
+        ))}
+      </div>
+    </section>
+
+    <section
+      class="domain-panel"
+      data-domain-panel="media"
+      aria-labelledby="media-title"
+      hidden
+    >
+      <header class="domain-heading">
+        <p class="eyebrow">March Jinn / Domain 02</p>
+        <h1 id="media-title">Media</h1>
+      </header>
+
+      <div class="domain-catalog">
+        {mediaSections.map((section) => (
+          <CatalogSection
+            title={section.title}
+            collections={section.collections}
+          />
+        ))}
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    function renderDomain(domain: string) {
+      const panels = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-domain-panel]")
+      );
+
+      const navigationItems = Array.from(
+        document.querySelectorAll<HTMLButtonElement>("[data-domain]")
+      );
+
+      const target = panels.find(
+        (panel) => panel.dataset.domainPanel === domain
+      );
+
+      if (!target) return;
+
+      panels.forEach((panel) => {
+        panel.hidden = panel !== target;
+      });
+
+      navigationItems.forEach((button) => {
+        const active = button.dataset.domain === domain;
+
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+
+      document.title =
+        domain === "music"
+          ? "March Jinn"
+          : `${domain.charAt(0).toUpperCase()}${domain.slice(1)} — March Jinn`;
+    }
+
+    function selectDomain(domain: string, updateHistory = true) {
+      if (!document.querySelector(
+        `[data-domain-panel="${domain}"]`
+      )) return;
+
+      renderDomain(domain);
+
+      try {
+        localStorage.setItem("marchjinn-domain", domain);
+      } catch {
+        // The interface remains functional without local storage.
+      }
+
+      if (updateHistory) {
+        history.pushState(
+          {
+            ...history.state,
+            marchJinnDomain: domain
+          },
+          "",
+          window.location.pathname
+        );
+      }
+    }
+
+    function initializeDomainInterface() {
+      let initialDomain = "music";
+
+      try {
+        initialDomain =
+          history.state?.marchJinnDomain ||
+          localStorage.getItem("marchjinn-domain") ||
+          "music";
+      } catch {
+        initialDomain = history.state?.marchJinnDomain || "music";
+      }
+
+      if (!document.querySelector(
+        `[data-domain-panel="${initialDomain}"]`
+      )) {
+        initialDomain = "music";
+      }
+
+      renderDomain(initialDomain);
+
+      history.replaceState(
+        {
+          ...history.state,
+          marchJinnDomain: initialDomain
+        },
+        "",
+        window.location.pathname
+      );
+    }
+
+    if (!window.__marchJinnDomainEventsInitialized) {
+      window.addEventListener("marchjinn:domain-change", (event) => {
+        const customEvent = event as CustomEvent<{ domain: string }>;
+        selectDomain(customEvent.detail.domain);
+      });
+
+      window.addEventListener("popstate", (event) => {
+        let fallbackDomain = "music";
+
+        try {
+          fallbackDomain =
+            localStorage.getItem("marchjinn-domain") || "music";
+        } catch {
+          // Use Music as the default.
+        }
+
+        selectDomain(
+          event.state?.marchJinnDomain || fallbackDomain,
+          false
+        );
+      });
+
+      window.__marchJinnDomainEventsInitialized = true;
+    }
+
+    document.addEventListener(
+      "astro:page-load",
+      initializeDomainInterface
+    );
+
+    initializeDomainInterface();
+  </script>
 </SiteLayout>
