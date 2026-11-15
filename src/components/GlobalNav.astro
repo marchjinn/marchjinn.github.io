@@ -1,20 +1,66 @@
+
 ---
-const items = [
-  { label: "Music", href: "/music/" },
-  { label: "Media", href: "/media/" }
+const domains = [
+  { id: "music", label: "Music" },
+  { id: "media", label: "Media" },
+  { id: "fashion", label: "Fashion" },
+  { id: "beauty", label: "Beauty" },
+  { id: "food-beverage", label: "Food & Beverage" },
+  { id: "technology", label: "Technology" }
 ];
-const currentPath = Astro.url.pathname;
 ---
-<nav class="global-nav" aria-label="Primary navigation">
+
+<nav class="global-nav" aria-label="Global navigation">
   <div class="global-nav__inner">
-    {items.map((item) => (
-      <a
-        class:list={["global-nav__item", currentPath.startsWith(item.href) && "is-active"]}
-        href={item.href}
-        aria-current={currentPath.startsWith(item.href) ? "page" : undefined}
-      >
-        {item.label}
-      </a>
-    ))}
+
+    <div class="global-nav__domains">
+      {domains.map((domain) => (
+        <button
+          class="global-nav__item"
+          type="button"
+          data-domain={domain.id}
+          aria-pressed={domain.id === "music" ? "true" : "false"}
+        >
+          {domain.label}
+        </button>
+      ))}
+    </div>
+
+    <a
+      class="global-nav__brand"
+      href="/"
+      aria-label="March Jinn Home"
+    >
+      March Jinn
+    </a>
+
   </div>
 </nav>
+
+<script>
+  const nav = document.querySelector(".global-nav");
+
+  if (nav) {
+    const buttons = nav.querySelectorAll("[data-domain]");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const selectedDomain = button.getAttribute("data-domain");
+
+        buttons.forEach((item) => {
+          const isActive =
+            item.getAttribute("data-domain") === selectedDomain;
+
+          item.classList.toggle("is-active", isActive);
+          item.setAttribute("aria-pressed", String(isActive));
+        });
+
+        window.dispatchEvent(
+          new CustomEvent("marchjinn:domain-change", {
+            detail: { domain: selectedDomain }
+          })
+        );
+      });
+    });
+  }
+</script>
