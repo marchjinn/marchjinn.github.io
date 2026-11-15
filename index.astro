@@ -1,0 +1,38 @@
+
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const domains = [
+  { id: "music", label: "Music" },
+  { id: "media", label: "Media" },
+  { id: "fashion", label: "Fashion" },
+  { id: "beauty", label: "Beauty" },
+  { id: "food-beverage", label: "Food & Beverage" },
+  { id: "technology", label: "Technology" }
+];
+---
+
+<SiteLayout
+  title="March Jinn"
+  description="March Jinn Official Website"
+>
+  <section class="platform-home" aria-label="March Jinn Digital Platform">
+    <div class="platform-home__intro">
+      <p class="eyebrow">March Jinn</p>
+      <h1>March Jinn</h1>
+    </div>
+
+    <nav class="domain-selector" aria-label="Explore March Jinn">
+      {domains.map((domain) => (
+        <button
+          class="domain-selector__item"
+          type="button"
+          data-domain={domain.id}
+          aria-pressed={domain.id === "music" ? "true" : "false"}
+        >
+          {domain.label}
+        </button>
+      ))}
+    </nav>
+  </section>
+</SiteLayout>
