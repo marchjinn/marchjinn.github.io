@@ -2,33 +2,43 @@
 ---
 const domains = [
   { id: "music", label: "Music" },
-  { id: "media", label: "Media" }
+  { id: "media", label: "Media" },
+  { id: "fashion", label: "Fashion" },
+  { id: "beauty", label: "Beauty" },
+  { id: "food-beverage", label: "Food & Beverage" },
+  { id: "technology", label: "Technology" }
 ];
 ---
 
 <nav class="global-nav" aria-label="Global navigation">
   <div class="global-nav__inner">
-    <button
-      class="global-nav__item global-nav__item--music"
-      type="button"
-      data-domain="music"
-      aria-pressed="true"
-    >
-      Music
-    </button>
 
-    <a class="global-nav__brand" href="/" aria-label="March Jinn — main environment">
-      <span>March Jinn</span>
+    {domains.slice(0, 3).map((domain) => (
+      <button
+        class="global-nav__item"
+        type="button"
+        data-domain={domain.id}
+        aria-pressed={domain.id === "music" ? "true" : "false"}
+      >
+        {domain.label}
+      </button>
+    ))}
+
+    <a class="global-nav__brand" href="/" aria-label="Fire Jinn — March Jinn main environment">
+      <span>Fire Jinn</span>
     </a>
 
-    <button
-      class="global-nav__item global-nav__item--media"
-      type="button"
-      data-domain="media"
-      aria-pressed="false"
-    >
-      Media
-    </button>
+    {domains.slice(3).map((domain) => (
+      <button
+        class="global-nav__item"
+        type="button"
+        data-domain={domain.id}
+        aria-pressed="false"
+      >
+        {domain.label}
+      </button>
+    ))}
+
   </div>
 </nav>
 
@@ -51,6 +61,7 @@ const domains = [
     buttons.forEach((button) => {
       button.addEventListener("click", () => {
         const selectedDomain = button.getAttribute("data-domain");
+
         setActiveDomain(selectedDomain);
 
         window.dispatchEvent(
@@ -66,6 +77,7 @@ const domains = [
     });
 
     const path = window.location.pathname;
+
     if (path.startsWith("/media")) setActiveDomain("media");
     else if (path.startsWith("/music")) setActiveDomain("music");
   }
