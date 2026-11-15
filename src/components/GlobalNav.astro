@@ -2,58 +2,56 @@
 ---
 const domains = [
   { id: "music", label: "Music" },
-  { id: "media", label: "Media" },
-  { id: "fashion", label: "Fashion" },
-  { id: "beauty", label: "Beauty" },
-  { id: "food-beverage", label: "Food & Beverage" },
-  { id: "technology", label: "Technology" }
+  { id: "media", label: "Media" }
 ];
 ---
 
 <nav class="global-nav" aria-label="Global navigation">
   <div class="global-nav__inner">
-
-    <div class="global-nav__domains">
-      {domains.map((domain) => (
-        <button
-          class="global-nav__item"
-          type="button"
-          data-domain={domain.id}
-          aria-pressed={domain.id === "music" ? "true" : "false"}
-        >
-          {domain.label}
-        </button>
-      ))}
-    </div>
-
-    <a
-      class="global-nav__brand"
-      href="/"
-      aria-label="March Jinn Home"
+    <button
+      class="global-nav__item global-nav__item--music"
+      type="button"
+      data-domain="music"
+      aria-pressed="true"
     >
-      March Jinn
+      Music
+    </button>
+
+    <a class="global-nav__brand" href="/" aria-label="March Jinn — main environment">
+      <span>March Jinn</span>
     </a>
 
+    <button
+      class="global-nav__item global-nav__item--media"
+      type="button"
+      data-domain="media"
+      aria-pressed="false"
+    >
+      Media
+    </button>
   </div>
 </nav>
 
 <script>
-  const nav = document.querySelector(".global-nav");
+  function initialiseGlobalNav() {
+    const nav = document.querySelector(".global-nav");
+    if (!nav || nav.dataset.initialised === "true") return;
 
-  if (nav) {
+    nav.dataset.initialised = "true";
     const buttons = nav.querySelectorAll("[data-domain]");
+
+    function setActiveDomain(domainId) {
+      buttons.forEach((button) => {
+        const active = button.getAttribute("data-domain") === domainId;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    }
 
     buttons.forEach((button) => {
       button.addEventListener("click", () => {
         const selectedDomain = button.getAttribute("data-domain");
-
-        buttons.forEach((item) => {
-          const isActive =
-            item.getAttribute("data-domain") === selectedDomain;
-
-          item.classList.toggle("is-active", isActive);
-          item.setAttribute("aria-pressed", String(isActive));
-        });
+        setActiveDomain(selectedDomain);
 
         window.dispatchEvent(
           new CustomEvent("marchjinn:domain-change", {
@@ -62,5 +60,16 @@ const domains = [
         );
       });
     });
+
+    window.addEventListener("marchjinn:domain-change", (event) => {
+      setActiveDomain(event.detail?.domain);
+    });
+
+    const path = window.location.pathname;
+    if (path.startsWith("/media")) setActiveDomain("media");
+    else if (path.startsWith("/music")) setActiveDomain("music");
   }
+
+  document.addEventListener("astro:page-load", initialiseGlobalNav);
+  initialiseGlobalNav();
 </script>
