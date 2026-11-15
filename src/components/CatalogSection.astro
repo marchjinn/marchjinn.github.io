@@ -1,0 +1,72 @@
+---
+interface CatalogItem {
+  title: string;
+  year?: string;
+  href: string;
+  image?: string;
+}
+
+interface Collection {
+  title: string;
+  format?: "square" | "wide" | "portrait";
+  items?: CatalogItem[];
+}
+
+interface Props {
+  title: string;
+  collections: Collection[];
+}
+
+const { title, collections } = Astro.props;
+---
+
+<section class="catalog-section" aria-label={title}>
+  <h2 class="catalog-section__title">{title}</h2>
+
+  <div class="catalog-section__collections">
+    {collections.map((collection) => (
+      <section
+        class="catalog-collection"
+        data-format={collection.format ?? "square"}
+        aria-label={collection.title}
+      >
+        <div class="catalog-collection__heading">
+          <h3>{collection.title}</h3>
+        </div>
+
+        {collection.items && collection.items.length > 0 ? (
+          <div class="catalog-shelf">
+            <div class="catalog-shelf__track">
+              {collection.items.map((item) => (
+                <a class="catalog-card" href={item.href}>
+                  <div class="catalog-card__media">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt=""
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span class="catalog-card__placeholder"></span>
+                    )}
+                  </div>
+
+                  <div class="catalog-card__information">
+                    <span class="catalog-card__title">{item.title}</span>
+                    {item.year && (
+                      <span class="catalog-card__year">{item.year}</span>
+                    )}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p class="catalog-collection__empty">
+            No published items
+          </p>
+        )}
+      </section>
+    ))}
+  </div>
+</section>
