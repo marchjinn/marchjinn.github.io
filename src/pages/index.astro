@@ -1,6 +1,7 @@
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
 import CatalogSection from "../components/CatalogSection.astro";
+import MediaCatalogNavigation from "../components/MediaCatalogNavigation.astro";
 
 const musicSections = [
   {
@@ -28,60 +29,6 @@ const musicSections = [
     ]
   }
 ];
-
-const mediaSections = [
-  {
-    title: "Videos",
-    collections: [
-      { title: "Music Videos", format: "wide" },
-      { title: "Films", format: "wide" },
-      { title: "Vlogs", format: "wide" },
-      { title: "Interviews", format: "wide" },
-      { title: "Shows", format: "wide" },
-      { title: "Performances", format: "wide" }
-    ]
-  },
-  {
-    title: "Photos",
-    collections: [
-      { title: "Portraits", format: "portrait" },
-      { title: "Editorials", format: "portrait" },
-      { title: "Campaigns", format: "portrait" },
-      { title: "Performances", format: "portrait" },
-      { title: "Events", format: "portrait" },
-      { title: "Lifestyle", format: "portrait" }
-    ]
-  },
-  {
-    title: "Audios",
-    collections: [
-      { title: "Podcasts", format: "square" },
-      { title: "Interviews", format: "square" },
-      { title: "Broadcasts", format: "square" }
-    ]
-  },
-  {
-    title: "Streams",
-    collections: [
-      { title: "Screen Streams", format: "wide" },
-      { title: "IRL Streams", format: "wide" },
-      { title: "Performances", format: "wide" },
-      { title: "Shows", format: "wide" },
-      { title: "Specials", format: "wide" }
-    ]
-  },
-  {
-    title: "Publications",
-    collections: [
-      { title: "Posts", format: "portrait" },
-      { title: "Articles", format: "portrait" },
-      { title: "News", format: "portrait" },
-      { title: "Reviews", format: "portrait" },
-      { title: "Interviews", format: "portrait" },
-      { title: "Features", format: "portrait" }
-    ]
-  }
-];
 ---
 
 <SiteLayout
@@ -89,8 +36,6 @@ const mediaSections = [
   description="March Jinn Official Website"
 >
   <div class="domain-environment">
-
-    <!-- MUSIC DOMAIN -->
 
     <section
       class="domain-panel"
@@ -112,8 +57,6 @@ const mediaSections = [
       </div>
     </section>
 
-    <!-- MEDIA DOMAIN -->
-
     <section
       class="domain-panel"
       data-domain-panel="media"
@@ -126,12 +69,7 @@ const mediaSections = [
       </header>
 
       <div class="domain-catalog">
-        {mediaSections.map((section) => (
-          <CatalogSection
-            title={section.title}
-            collections={section.collections}
-          />
-        ))}
+        <MediaCatalogNavigation />
       </div>
     </section>
 
@@ -185,7 +123,7 @@ const mediaSections = [
 
       if (updateHistory) {
         history.pushState(
-          { domain },
+          { ...history.state, domain },
           "",
           window.location.pathname
         );
@@ -204,13 +142,10 @@ const mediaSections = [
         fallbackDomain =
           localStorage.getItem("marchjinn-domain") || "music";
       } catch {
-        // Use the default domain.
+        // Use Music as the default domain.
       }
 
-      selectDomain(
-        event.state?.domain || fallbackDomain,
-        false
-      );
+      selectDomain(event.state?.domain || fallbackDomain, false);
     });
 
     let initialDomain = "music";
