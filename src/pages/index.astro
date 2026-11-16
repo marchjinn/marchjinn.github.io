@@ -76,15 +76,21 @@ const mediaCollections = getMediaCatalogCollections();
   </div>
 
   <script>
-    const panels = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-domain-panel]")
-    );
+    function getPanels() {
+      return Array.from(
+        document.querySelectorAll<HTMLElement>("[data-domain-panel]")
+      );
+    }
 
-    const navigationItems = Array.from(
-      document.querySelectorAll<HTMLButtonElement>("[data-domain]")
-    );
+    function getNavigationItems() {
+      return Array.from(
+        document.querySelectorAll<HTMLButtonElement>("[data-domain]")
+      );
+    }
 
     function renderDomain(domain: string) {
+      const panels = getPanels();
+
       const target = panels.find(
         (panel) => panel.dataset.domainPanel === domain
       );
@@ -95,7 +101,7 @@ const mediaCollections = getMediaCatalogCollections();
         panel.hidden = panel !== target;
       });
 
-      navigationItems.forEach((button) => {
+      getNavigationItems().forEach((button) => {
         const active = button.dataset.domain === domain;
 
         button.classList.toggle("is-active", active);
@@ -109,7 +115,9 @@ const mediaCollections = getMediaCatalogCollections();
     }
 
     function selectDomain(domain: string, updateHistory = true) {
-      if (!panels.some((panel) => panel.dataset.domainPanel === domain)) {
+      if (!getPanels().some(
+        (panel) => panel.dataset.domainPanel === domain
+      )) {
         return;
       }
 
@@ -130,8 +138,40 @@ const mediaCollections = getMediaCatalogCollections();
       }
     }
 
+    function initializeDomain() {
+      const panels = getPanels();
+
+      if (panels.length === 0) return;
+
+      let initialDomain = "music";
+
+      try {
+        initialDomain =
+          history.state?.domain ||
+          localStorage.getItem("marchjinn-domain") ||
+          "music";
+      } catch {
+        initialDomain = history.state?.domain || "music";
+      }
+
+      if (!panels.some(
+        (panel) => panel.dataset.domainPanel === initialDomain
+      )) {
+        initialDomain = "music";
+      }
+
+      renderDomain(initialDomain);
+
+      history.replaceState(
+        { ...history.state, domain: initialDomain },
+        "",
+        window.location.pathname
+      );
+    }
+
     window.addEventListener("marchjinn:domain-change", (event) => {
       const customEvent = event as CustomEvent<{ domain: string }>;
+
       selectDomain(customEvent.detail.domain);
     });
 
@@ -148,27 +188,8 @@ const mediaCollections = getMediaCatalogCollections();
       selectDomain(event.state?.domain || fallbackDomain, false);
     });
 
-    let initialDomain = "music";
+    document.addEventListener("astro:page-load", initializeDomain);
 
-    try {
-      initialDomain =
-        history.state?.domain ||
-        localStorage.getItem("marchjinn-domain") ||
-        "music";
-    } catch {
-      initialDomain = history.state?.domain || "music";
-    }
-
-    if (!panels.some((panel) => panel.dataset.domainPanel === initialDomain)) {
-      initialDomain = "music";
-    }
-
-    renderDomain(initialDomain);
-
-    history.replaceState(
-      { ...history.state, domain: initialDomain },
-      "",
-      window.location.pathname
-    );
+    initializeDomain();
   </script>
 </SiteLayout>
