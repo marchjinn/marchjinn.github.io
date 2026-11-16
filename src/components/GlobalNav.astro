@@ -1,3 +1,4 @@
+
 ---
 const domains = [
   { id: "music", label: "Music" },
@@ -39,13 +40,22 @@ const domains = [
 <script>
   function syncActiveDomain() {
     const path = window.location.pathname;
+    let activeDomain: string;
 
-    const isMusic =
-      path === "/" ||
-      path.startsWith("/music/") ||
-      path.startsWith("/zillion/");
+    if (path === "/") {
+      const visiblePanel = document.querySelector<HTMLElement>(
+        "[data-domain-panel]:not([hidden])"
+      );
 
-    const activeDomain = isMusic ? "music" : "media";
+      activeDomain = visiblePanel?.dataset.domainPanel || "music";
+    } else if (
+      path === "/music/" ||
+      path === "/zillion/"
+    ) {
+      activeDomain = "music";
+    } else {
+      activeDomain = "media";
+    }
 
     document.querySelectorAll<HTMLButtonElement>("[data-domain]").forEach(
       (button) => {
