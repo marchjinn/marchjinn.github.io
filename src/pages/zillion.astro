@@ -1,9 +1,21 @@
+
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
+import { getMusicItemBySlug } from "../content/music";
+
+const item = getMusicItemBySlug("zillion");
+
+if (!item) {
+  throw new Error("Music item 'zillion' was not found.");
+}
 ---
-<SiteLayout title="Zillion" description="March Jinn Official Website">
+
+<SiteLayout
+  title={item.title}
+  description={item.description ?? `${item.title} — March Jinn.`}
+>
   <section class="entry-page" aria-labelledby="page-title">
-    <p class="eyebrow">March Jinn</p>
-    <h1 id="page-title">Zillion</h1>
+    <p class="eyebrow">March Jinn / Music / Releases / Albums</p>
+    <h1 id="page-title">{item.title}</h1>
   </section>
 </SiteLayout>
