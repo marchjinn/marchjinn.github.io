@@ -129,7 +129,11 @@ const pageDescription = category
   description={pageDescription}
 >
   {category ? (
-    <section class="domain-page" aria-labelledby="page-title">
+    <section
+      class="domain-page"
+      data-domain-page="media"
+      aria-labelledby="page-title"
+    >
       <header class="domain-heading">
         <p class="eyebrow">
           March Jinn / Media / {category.section}
@@ -166,7 +170,11 @@ const pageDescription = category
       </a>
     </section>
   ) : item ? (
-    <section class="entry-page" aria-labelledby="page-title">
+    <section
+      class="entry-page"
+      data-domain-page="music"
+      aria-labelledby="page-title"
+    >
       <p class="eyebrow">March Jinn / Music</p>
 
       <h1 id="page-title">{item.title}</h1>
