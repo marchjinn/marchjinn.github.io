@@ -43,10 +43,6 @@ const domains = [
     media: "marchjinn-last-media-page"
   };
 
-  const ROUTE_DOMAIN_PREFIX = "marchjinn-route-domain:";
-
-  let activeDomain: "music" | "media" = "music";
-
   function getCurrentDomain(): "music" | "media" {
     const path = window.location.pathname;
 
@@ -73,8 +69,7 @@ const domains = [
   }
 
   function syncActiveDomain() {
-    activeDomain = getCurrentDomain();
-
+    const activeDomain = getCurrentDomain();
     const currentPath = window.location.pathname;
 
     document.querySelectorAll<HTMLButtonElement>("[data-domain]").forEach(
@@ -90,13 +85,9 @@ const domains = [
       localStorage.setItem("marchjinn-domain", activeDomain);
 
       if (currentPath !== "/") {
-        const storageKey = LAST_PAGE_KEYS[activeDomain];
-
-        localStorage.setItem(storageKey, currentPath);
-
         localStorage.setItem(
-          `${ROUTE_DOMAIN_PREFIX}${currentPath}`,
-          activeDomain
+          LAST_PAGE_KEYS[activeDomain],
+          currentPath
         );
       }
     } catch {
@@ -124,43 +115,9 @@ const domains = [
     return fallbackPath;
   }
 
-  function getDomainForPath(path: string): string | null {
-    if (path === "/") return "music";
-    if (path === "/media/") return "media";
-
-    try {
-      return localStorage.getItem(
-        `${ROUTE_DOMAIN_PREFIX}${path}`
-      );
-    } catch {
-      return null;
-    }
-  }
-
-  function handleDomainAwareBack() {
-    const targetPath = window.location.pathname;
-    const targetDomain = getDomainForPath(targetPath);
-
-    if (!targetDomain || targetDomain === activeDomain) {
-      return;
-    }
-
-    const fallbackPath = activeDomain === "music" ? "/" : "/media/";
-
-    try {
-      localStorage.setItem("marchjinn-domain", activeDomain);
-    } catch {
-      // Navigation remains functional without local storage.
-    }
-
-    window.location.replace(fallbackPath);
-  }
-
   document.addEventListener("astro:page-load", syncActiveDomain);
 
   syncActiveDomain();
-
-  window.addEventListener("popstate", handleDomainAwareBack);
 
   document.addEventListener("click", (event) => {
     const target = event.target;
@@ -181,7 +138,9 @@ const domains = [
     }
 
     const currentPath = window.location.pathname;
+    const currentDomain = getCurrentDomain();
 
+    // On the main page, switch the visible domain panel.
     if (currentPath === "/") {
       window.dispatchEvent(
         new CustomEvent("marchjinn:domain-change", {
@@ -193,9 +152,15 @@ const domains = [
       return;
     }
 
-    if (activeDomain === selectedDomain) return;
+    let destination: string;
 
-    const destination = getSavedPage(selectedDomain);
+    // Clicking the active domain returns to its main page.
+    if (selectedDomain === currentDomain) {
+      destination = selectedDomain === "music" ? "/" : "/media/";
+    } else {
+      // Clicking another domain restores its last visited page.
+      destination = getSavedPage(selectedDomain);
+    }
 
     try {
       localStorage.setItem("marchjinn-domain", selectedDomain);
