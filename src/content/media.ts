@@ -1,8 +1,22 @@
+
+export type MediaFormat = "square" | "wide" | "portrait";
+
 export interface MediaCategory {
   slug: string;
   title: string;
   section: string;
-  format: "square" | "wide" | "portrait";
+  format: MediaFormat;
+}
+
+interface MediaCategoryDefinition {
+  slug: string;
+  title: string;
+}
+
+interface MediaSectionDefinition {
+  title: string;
+  format: MediaFormat;
+  categories: MediaCategoryDefinition[];
 }
 
 export interface MediaItem {
@@ -10,87 +24,151 @@ export interface MediaItem {
   category: string;
   title: string;
   sourceUrl: string;
+  status: "draft" | "published";
   thumbnail?: string;
   publishedAt?: string;
   description?: string;
 }
 
-export const mediaSections = [
+export interface MediaCatalogCard {
+  title: string;
+  href: string;
+  image?: string;
+}
+
+export interface MediaCatalogCollection {
+  title: string;
+  format: MediaFormat;
+  items: MediaCatalogCard[];
+}
+
+export const mediaSections: MediaSectionDefinition[] = [
   {
     title: "Videos",
+    format: "wide",
     categories: [
-      { slug: "music-videos", title: "Music Videos", format: "wide" },
-      { slug: "films", title: "Films", format: "wide" },
-      { slug: "vlogs", title: "Vlogs", format: "wide" },
-      { slug: "interviews", title: "Interviews", format: "wide" },
-      { slug: "shows", title: "Shows", format: "wide" },
-      { slug: "performances", title: "Performances", format: "wide" }
+      { slug: "music-videos", title: "Music Videos" },
+      { slug: "films", title: "Films" },
+      { slug: "vlogs", title: "Vlogs" },
+      { slug: "interviews", title: "Interviews" },
+      { slug: "shows", title: "Shows" },
+      { slug: "performances", title: "Performances" }
     ]
   },
   {
     title: "Photos",
+    format: "portrait",
     categories: [
-      { slug: "portraits", title: "Portraits", format: "portrait" },
-      { slug: "editorials", title: "Editorials", format: "portrait" },
-      { slug: "campaigns", title: "Campaigns", format: "portrait" },
-      { slug: "photo-performances", title: "Performances", format: "portrait" },
-      { slug: "events", title: "Events", format: "portrait" },
-      { slug: "lifestyle", title: "Lifestyle", format: "portrait" }
+      { slug: "portraits", title: "Portraits" },
+      { slug: "editorials", title: "Editorials" },
+      { slug: "campaigns", title: "Campaigns" },
+      { slug: "photo-performances", title: "Performances" },
+      { slug: "events", title: "Events" },
+      { slug: "lifestyle", title: "Lifestyle" }
     ]
   },
   {
     title: "Audios",
+    format: "square",
     categories: [
-      { slug: "podcasts", title: "Podcasts", format: "square" },
-      { slug: "audio-interviews", title: "Interviews", format: "square" },
-      { slug: "broadcasts", title: "Broadcasts", format: "square" }
+      { slug: "podcasts", title: "Podcasts" },
+      { slug: "audio-interviews", title: "Interviews" },
+      { slug: "broadcasts", title: "Broadcasts" }
     ]
   },
   {
     title: "Streams",
+    format: "wide",
     categories: [
-      { slug: "screen-streams", title: "Screen Streams", format: "wide" },
-      { slug: "irl-streams", title: "IRL Streams", format: "wide" },
-      { slug: "stream-performances", title: "Performances", format: "wide" },
-      { slug: "stream-shows", title: "Shows", format: "wide" },
-      { slug: "stream-specials", title: "Specials", format: "wide" }
+      { slug: "screen-streams", title: "Screen Streams" },
+      { slug: "irl-streams", title: "IRL Streams" },
+      { slug: "stream-performances", title: "Performances" },
+      { slug: "stream-shows", title: "Shows" },
+      { slug: "stream-specials", title: "Specials" }
     ]
   },
   {
     title: "Publications",
+    format: "portrait",
     categories: [
-      { slug: "posts", title: "Posts", format: "portrait" },
-      { slug: "articles", title: "Articles", format: "portrait" },
-      { slug: "news", title: "News", format: "portrait" },
-      { slug: "reviews", title: "Reviews", format: "portrait" },
-      { slug: "publication-interviews", title: "Interviews", format: "portrait" },
-      { slug: "features", title: "Features", format: "portrait" }
+      { slug: "posts", title: "Posts" },
+      { slug: "articles", title: "Articles" },
+      { slug: "news", title: "News" },
+      { slug: "reviews", title: "Reviews" },
+      { slug: "publication-interviews", title: "Interviews" },
+      { slug: "features", title: "Features" }
     ]
   }
-] satisfies {
-  title: string;
-  categories: MediaCategory[];
-}[];
+];
 
 export const mediaCategories: MediaCategory[] =
   mediaSections.flatMap((section) =>
     section.categories.map((category) => ({
       ...category,
-      section: section.title
+      section: section.title,
+      format: section.format
     }))
   );
 
 /**
- * Media records will be added here.
- * No placeholder or fictional content is published.
+ * Media records.
+ * Only items with status "published" appear in public catalogs.
  */
 export const mediaItems: MediaItem[] = [];
+
+/**
+ * Returns the newest published item in a category.
+ */
+export function getLatestMediaItem(
+  categorySlug: string
+): MediaItem | undefined {
+  return mediaItems
+    .filter(
+      (item) =>
+        item.category === categorySlug &&
+        item.status === "published"
+    )
+    .sort((a, b) => {
+      const dateA = a.publishedAt
+        ? new Date(a.publishedAt).getTime()
+        : 0;
+
+      const dateB = b.publishedAt
+        ? new Date(b.publishedAt).getTime()
+        : 0;
+
+      return dateB - dateA;
+    })[0];
+}
+
+/**
+ * Creates the category-card shelves for the Media landing page.
+ * Every category remains visible, even when it has no published items.
+ * The category cover comes from its newest published item.
+ */
+export function getMediaCatalogCollections(): MediaCatalogCollection[] {
+  return mediaSections.map((section) => ({
+    title: section.title,
+    format: section.format,
+    items: section.categories.map((category) => {
+      const latestItem = getLatestMediaItem(category.slug);
+
+      return {
+        title: category.title,
+        href: `/${category.slug}/`,
+        image: latestItem?.thumbnail
+      };
+    })
+  }));
+}
 
 /**
  * Converts supported original source URLs into provider-specific embed URLs.
  * Unsupported providers retain their original direct links.
  */
-export function getMediaEmbedUrl(sourceUrl: string): string | undefined {
+export function getMediaEmbedUrl(
+  sourceUrl: string
+): string | undefined {
   try {
     const url = new URL(sourceUrl);
     const host = url.hostname.replace(/^www\./, "").toLowerCase();
