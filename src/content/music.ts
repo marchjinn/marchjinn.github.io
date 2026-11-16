@@ -130,7 +130,20 @@ export const musicSections: MusicSectionDefinition[] = [
  *
  * Only published records appear in public catalogs.
  */
-export const musicItems: MusicItem[] = [];
+export const musicItems: MusicItem[] = [
+  {
+    id: "zillion",
+    slug: "zillion",
+    title: "Zillion",
+    status: "published",
+    placements: [
+      {
+        section: "Releases",
+        category: "Albums"
+      }
+    ]
+  }
+];
 
 /**
  * Returns all published items assigned to a section and category.
