@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://marchjinn.com/</loc>
+  </url>
+  <url>
     <loc>https://marchjinn.com/zillion/</loc>
   </url>
   <url>
@@ -8,5 +11,88 @@
   </url>
   <url>
     <loc>https://marchjinn.com/media/</loc>
+  </url>
+
+  <url>
+    <loc>https://marchjinn.com/music-videos/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/films/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/vlogs/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/interviews/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/shows/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/performances/</loc>
+  </url>
+
+  <url>
+    <loc>https://marchjinn.com/portraits/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/editorials/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/campaigns/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/photo-performances/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/events/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/lifestyle/</loc>
+  </url>
+
+  <url>
+    <loc>https://marchjinn.com/podcasts/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/audio-interviews/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/broadcasts/</loc>
+  </url>
+
+  <url>
+    <loc>https://marchjinn.com/screen-streams/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/irl-streams/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/stream-performances/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/stream-shows/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/stream-specials/</loc>
+  </url>
+
+  <url>
+    <loc>https://marchjinn.com/posts/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/articles/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/news/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/reviews/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/publication-interviews/</loc>
+  </url>
+  <url>
+    <loc>https://marchjinn.com/features/</loc>
   </url>
 </urlset>
