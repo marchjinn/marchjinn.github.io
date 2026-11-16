@@ -45,7 +45,9 @@ const domains = [
 
   const ROUTE_DOMAIN_PREFIX = "marchjinn-route-domain:";
 
-  function getCurrentDomain() {
+  let activeDomain: "music" | "media" = "music";
+
+  function getCurrentDomain(): "music" | "media" {
     const path = window.location.pathname;
 
     if (path === "/") {
@@ -53,25 +55,26 @@ const domains = [
         "[data-domain-panel]:not([hidden])"
       );
 
-      return visiblePanel?.dataset.domainPanel || "music";
+      return visiblePanel?.dataset.domainPanel === "media"
+        ? "media"
+        : "music";
     }
 
     const domainPage = document.querySelector<HTMLElement>(
       "[data-domain-page]"
     );
 
-    if (domainPage?.dataset.domainPage) {
-      return domainPage.dataset.domainPage;
-    }
+    if (domainPage?.dataset.domainPage === "media") return "media";
+    if (domainPage?.dataset.domainPage === "music") return "music";
 
-    if (path === "/music/") return "music";
     if (path === "/media/") return "media";
 
     return "music";
   }
 
   function syncActiveDomain() {
-    const activeDomain = getCurrentDomain();
+    activeDomain = getCurrentDomain();
+
     const currentPath = window.location.pathname;
 
     document.querySelectorAll<HTMLButtonElement>("[data-domain]").forEach(
@@ -87,8 +90,7 @@ const domains = [
       localStorage.setItem("marchjinn-domain", activeDomain);
 
       if (currentPath !== "/") {
-        const storageKey =
-          LAST_PAGE_KEYS[activeDomain as keyof typeof LAST_PAGE_KEYS];
+        const storageKey = LAST_PAGE_KEYS[activeDomain];
 
         localStorage.setItem(storageKey, currentPath);
 
@@ -122,51 +124,40 @@ const domains = [
     return fallbackPath;
   }
 
-  function handleDomainAwareBack() {
-    const currentDomain = getCurrentDomain();
-    const targetPath = window.location.pathname;
+  function getDomainForPath(path: string): string | null {
+    if (path === "/") return "music";
+    if (path === "/media/") return "media";
 
-    let targetDomain: string | null = null;
-
-    if (targetPath === "/") {
-      targetDomain = "music";
-    } else if (targetPath === "/media/") {
-      targetDomain = "media";
-    } else {
-      try {
-        targetDomain = localStorage.getItem(
-          `${ROUTE_DOMAIN_PREFIX}${targetPath}`
-        );
-      } catch {
-        return;
-      }
+    try {
+      return localStorage.getItem(
+        `${ROUTE_DOMAIN_PREFIX}${path}`
+      );
+    } catch {
+      return null;
     }
+  }
 
-    if (!targetDomain || targetDomain === currentDomain) {
+  function handleDomainAwareBack() {
+    const targetPath = window.location.pathname;
+    const targetDomain = getDomainForPath(targetPath);
+
+    if (!targetDomain || targetDomain === activeDomain) {
       return;
     }
 
-    const fallbackPath = currentDomain === "music" ? "/" : "/media/";
+    const fallbackPath = activeDomain === "music" ? "/" : "/media/";
 
     try {
-      localStorage.setItem("marchjinn-domain", currentDomain);
+      localStorage.setItem("marchjinn-domain", activeDomain);
     } catch {
       // Navigation remains functional without local storage.
     }
-
-    history.replaceState(
-      {
-        ...(history.state || {}),
-        domain: currentDomain
-      },
-      "",
-      window.location.href
-    );
 
     window.location.replace(fallbackPath);
   }
 
   document.addEventListener("astro:page-load", syncActiveDomain);
+
   syncActiveDomain();
 
   window.addEventListener("popstate", handleDomainAwareBack);
@@ -202,9 +193,7 @@ const domains = [
       return;
     }
 
-    const currentDomain = getCurrentDomain();
-
-    if (currentDomain === selectedDomain) return;
+    if (activeDomain === selectedDomain) return;
 
     const destination = getSavedPage(selectedDomain);
 
