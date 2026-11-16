@@ -43,6 +43,8 @@ const domains = [
     media: "marchjinn-last-media-page"
   };
 
+  const ROUTE_DOMAIN_PREFIX = "marchjinn-route-domain:";
+
   function getCurrentDomain() {
     const path = window.location.pathname;
 
@@ -84,12 +86,16 @@ const domains = [
     try {
       localStorage.setItem("marchjinn-domain", activeDomain);
 
-      // Never overwrite a saved content page with the main page.
       if (currentPath !== "/") {
         const storageKey =
           LAST_PAGE_KEYS[activeDomain as keyof typeof LAST_PAGE_KEYS];
 
         localStorage.setItem(storageKey, currentPath);
+
+        localStorage.setItem(
+          `${ROUTE_DOMAIN_PREFIX}${currentPath}`,
+          activeDomain
+        );
       }
     } catch {
       // Navigation remains functional without local storage.
@@ -116,8 +122,54 @@ const domains = [
     return fallbackPath;
   }
 
+  function handleDomainAwareBack() {
+    const currentDomain = getCurrentDomain();
+    const targetPath = window.location.pathname;
+
+    let targetDomain: string | null = null;
+
+    if (targetPath === "/") {
+      targetDomain = "music";
+    } else if (targetPath === "/media/") {
+      targetDomain = "media";
+    } else {
+      try {
+        targetDomain = localStorage.getItem(
+          `${ROUTE_DOMAIN_PREFIX}${targetPath}`
+        );
+      } catch {
+        return;
+      }
+    }
+
+    if (!targetDomain || targetDomain === currentDomain) {
+      return;
+    }
+
+    const fallbackPath = currentDomain === "music" ? "/" : "/media/";
+
+    try {
+      localStorage.setItem("marchjinn-domain", currentDomain);
+    } catch {
+      // Navigation remains functional without local storage.
+    }
+
+    history.replaceState(
+      {
+        ...(history.state || {}),
+        domain: currentDomain
+      },
+      "",
+      window.location.href
+    );
+
+    window.location.replace(fallbackPath);
+  }
+
   document.addEventListener("astro:page-load", syncActiveDomain);
   syncActiveDomain();
+
+  window.addEventListener("popstate", handleDomainAwareBack);
 
   document.addEventListener("click", (event) => {
     const target = event.target;
