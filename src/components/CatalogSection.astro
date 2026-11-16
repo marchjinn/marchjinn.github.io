@@ -1,4 +1,7 @@
+
 ---
+type CatalogFormat = "square" | "wide" | "portrait";
+
 interface CatalogItem {
   title: string;
   year?: string;
@@ -8,20 +11,27 @@ interface CatalogItem {
 
 interface Collection {
   title: string;
-  format?: "square" | "wide" | "portrait";
+  format?: CatalogFormat;
   items?: CatalogItem[];
 }
 
 interface Props {
   title: string;
   collections: Collection[];
+  showTitle?: boolean;
 }
 
-const { title, collections } = Astro.props;
+const {
+  title,
+  collections,
+  showTitle = true
+} = Astro.props;
 ---
 
 <section class="catalog-section" aria-label={title}>
-  <h2 class="catalog-section__title">{title}</h2>
+  {showTitle && (
+    <h2 class="catalog-section__title">{title}</h2>
+  )}
 
   <div class="catalog-section__collections">
     {collections.map((collection) => (
@@ -45,6 +55,7 @@ const { title, collections } = Astro.props;
                         src={item.image}
                         alt=""
                         loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <span class="catalog-card__placeholder"></span>
@@ -52,9 +63,14 @@ const { title, collections } = Astro.props;
                   </div>
 
                   <div class="catalog-card__information">
-                    <span class="catalog-card__title">{item.title}</span>
+                    <span class="catalog-card__title">
+                      {item.title}
+                    </span>
+
                     {item.year && (
-                      <span class="catalog-card__year">{item.year}</span>
+                      <span class="catalog-card__year">
+                        {item.year}
+                      </span>
                     )}
                   </div>
                 </a>
