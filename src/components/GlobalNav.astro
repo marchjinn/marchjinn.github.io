@@ -38,24 +38,38 @@ const domains = [
 </nav>
 
 <script>
-  function syncActiveDomain() {
+  const LAST_PAGE_KEYS = {
+    music: "marchjinn-last-music-page",
+    media: "marchjinn-last-media-page"
+  };
+
+  function getCurrentDomain() {
     const path = window.location.pathname;
-    let activeDomain: string;
 
     if (path === "/") {
       const visiblePanel = document.querySelector<HTMLElement>(
         "[data-domain-panel]:not([hidden])"
       );
 
-      activeDomain = visiblePanel?.dataset.domainPanel || "music";
-    } else if (
-      path === "/music/" ||
-      path === "/zillion/"
-    ) {
-      activeDomain = "music";
-    } else {
-      activeDomain = "media";
+      return visiblePanel?.dataset.domainPanel || "music";
     }
+
+    const domainPage = document.querySelector<HTMLElement>(
+      "[data-domain-page]"
+    );
+
+    if (domainPage?.dataset.domainPage) {
+      return domainPage.dataset.domainPage;
+    }
+
+    if (path === "/music/") return "music";
+    if (path === "/media/") return "media";
+
+    return "music";
+  }
+
+  function syncActiveDomain() {
+    const activeDomain = getCurrentDomain();
 
     document.querySelectorAll<HTMLButtonElement>("[data-domain]").forEach(
       (button) => {
@@ -65,6 +79,16 @@ const domains = [
         button.setAttribute("aria-pressed", String(active));
       }
     );
+
+    try {
+      localStorage.setItem("marchjinn-domain", activeDomain);
+      localStorage.setItem(
+        LAST_PAGE_KEYS[activeDomain as keyof typeof LAST_PAGE_KEYS],
+        window.location.pathname
+      );
+    } catch {
+      // Navigation remains functional without local storage.
+    }
   }
 
   document.addEventListener("astro:page-load", syncActiveDomain);
@@ -81,9 +105,16 @@ const domains = [
 
     const selectedDomain = button.dataset.domain;
 
-    if (!selectedDomain) return;
+    if (
+      selectedDomain !== "music" &&
+      selectedDomain !== "media"
+    ) {
+      return;
+    }
 
-    if (window.location.pathname === "/") {
+    const currentPath = window.location.pathname;
+
+    if (currentPath === "/") {
       window.dispatchEvent(
         new CustomEvent("marchjinn:domain-change", {
           detail: { domain: selectedDomain }
@@ -94,11 +125,41 @@ const domains = [
       return;
     }
 
-    const destination =
-      selectedDomain === "media" ? "/media/" : "/";
+    const currentDomain = getCurrentDomain();
 
-    if (window.location.pathname !== destination) {
-      window.location.assign(destination);
+    if (currentDomain === selectedDomain) return;
+
+    const storageKey = LAST_PAGE_KEYS[
+      selectedDomain as keyof typeof LAST_PAGE_KEYS
+    ];
+
+    const fallbackPath =
+      selectedDomain === "music" ? "/" : "/media/";
+
+    let destination = fallbackPath;
+
+    try {
+      const savedPath = localStorage.getItem(storageKey);
+
+      if (savedPath && savedPath.startsWith("/")) {
+        destination = savedPath;
+      }
+
+      localStorage.setItem("marchjinn-domain", selectedDomain);
+    } catch {
+      // Use the default destination without local storage.
+    }
+
+    if (destination === "/") {
+      history.replaceState(
+        { ...history.state, domain: selectedDomain },
+        "",
+        currentPath
+      );
+    }
+
+    if (destination !== currentPath) {
+      window.location.replace(destination);
     }
   });
 </script>
