@@ -70,6 +70,7 @@ const domains = [
 
   function syncActiveDomain() {
     const activeDomain = getCurrentDomain();
+    const currentPath = window.location.pathname;
 
     document.querySelectorAll<HTMLButtonElement>("[data-domain]").forEach(
       (button) => {
@@ -82,13 +83,37 @@ const domains = [
 
     try {
       localStorage.setItem("marchjinn-domain", activeDomain);
-      localStorage.setItem(
-        LAST_PAGE_KEYS[activeDomain as keyof typeof LAST_PAGE_KEYS],
-        window.location.pathname
-      );
+
+      // Never overwrite a saved content page with the main page.
+      if (currentPath !== "/") {
+        const storageKey =
+          LAST_PAGE_KEYS[activeDomain as keyof typeof LAST_PAGE_KEYS];
+
+        localStorage.setItem(storageKey, currentPath);
+      }
     } catch {
       // Navigation remains functional without local storage.
     }
+  }
+
+  function getSavedPage(domain: "music" | "media") {
+    const fallbackPath = domain === "music" ? "/" : "/media/";
+
+    try {
+      const savedPath = localStorage.getItem(LAST_PAGE_KEYS[domain]);
+
+      if (
+        savedPath &&
+        savedPath.startsWith("/") &&
+        !savedPath.startsWith("//")
+      ) {
+        return savedPath;
+      }
+    } catch {
+      // Use the default destination without local storage.
+    }
+
+    return fallbackPath;
   }
 
   document.addEventListener("astro:page-load", syncActiveDomain);
@@ -129,33 +154,12 @@ const domains = [
 
     if (currentDomain === selectedDomain) return;
 
-    const storageKey = LAST_PAGE_KEYS[
-      selectedDomain as keyof typeof LAST_PAGE_KEYS
-    ];
-
-    const fallbackPath =
-      selectedDomain === "music" ? "/" : "/media/";
-
-    let destination = fallbackPath;
+    const destination = getSavedPage(selectedDomain);
 
     try {
-      const savedPath = localStorage.getItem(storageKey);
-
-      if (savedPath && savedPath.startsWith("/")) {
-        destination = savedPath;
-      }
-
       localStorage.setItem("marchjinn-domain", selectedDomain);
     } catch {
-      // Use the default destination without local storage.
-    }
-
-    if (destination === "/") {
-      history.replaceState(
-        { ...history.state, domain: selectedDomain },
-        "",
-        currentPath
-      );
+      // Navigation remains functional without local storage.
     }
 
     if (destination !== currentPath) {
