@@ -1,9 +1,42 @@
+
 ---
 import SiteLayout from "../../layouts/SiteLayout.astro";
+import CatalogSection from "../../components/CatalogSection.astro";
+
+import {
+  getMusicCatalogCollections
+} from "../../content/music";
+
+const releases = getMusicCatalogCollections("Releases");
+const lives = getMusicCatalogCollections("Lives");
+const credits = getMusicCatalogCollections("Credits");
 ---
-<SiteLayout title="Music" description="Music by March Jinn.">
-  <section class="domain-page" aria-labelledby="page-title">
-    <p class="eyebrow">March Jinn / Domain 01</p>
-    <h1 id="page-title">Music</h1>
+
+<SiteLayout
+  title="Music"
+  description="Music, releases, live performances and credits by March Jinn."
+>
+  <section class="domain-page music-page" aria-labelledby="page-title">
+    <header class="domain-heading">
+      <p class="eyebrow">March Jinn / Domain 01</p>
+      <h1 id="page-title">Music</h1>
+    </header>
+
+    <div class="domain-catalog">
+      <CatalogSection
+        title="Releases"
+        collections={releases}
+      />
+
+      <CatalogSection
+        title="Lives"
+        collections={lives}
+      />
+
+      <CatalogSection
+        title="Credits"
+        collections={credits}
+      />
+    </div>
   </section>
 </SiteLayout>
