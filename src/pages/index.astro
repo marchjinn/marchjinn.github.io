@@ -1,34 +1,21 @@
+
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
 import CatalogSection from "../components/CatalogSection.astro";
-import MediaCatalogNavigation from "../components/MediaCatalogNavigation.astro";
 
-const musicSections = [
-  {
-    title: "Releases",
-    collections: [
-      { title: "Albums", format: "square" },
-      { title: "Singles", format: "square" },
-      { title: "Appears On", format: "square" }
-    ]
-  },
-  {
-    title: "Lives",
-    collections: [
-      { title: "Tours", format: "wide" },
-      { title: "Festivals", format: "wide" },
-      { title: "Specials", format: "wide" }
-    ]
-  },
-  {
-    title: "Credits",
-    collections: [
-      { title: "Artist", format: "square" },
-      { title: "Producer", format: "square" },
-      { title: "Other", format: "square" }
-    ]
-  }
-];
+import {
+  getMusicCatalogCollections
+} from "../content/music";
+
+import {
+  getMediaCatalogCollections
+} from "../content/media";
+
+const musicReleases = getMusicCatalogCollections("Releases");
+const musicLives = getMusicCatalogCollections("Lives");
+const musicCredits = getMusicCatalogCollections("Credits");
+
+const mediaCollections = getMediaCatalogCollections();
 ---
 
 <SiteLayout
@@ -48,12 +35,20 @@ const musicSections = [
       </header>
 
       <div class="domain-catalog">
-        {musicSections.map((section) => (
-          <CatalogSection
-            title={section.title}
-            collections={section.collections}
-          />
-        ))}
+        <CatalogSection
+          title="Releases"
+          collections={musicReleases}
+        />
+
+        <CatalogSection
+          title="Lives"
+          collections={musicLives}
+        />
+
+        <CatalogSection
+          title="Credits"
+          collections={musicCredits}
+        />
       </div>
     </section>
 
@@ -69,7 +64,12 @@ const musicSections = [
       </header>
 
       <div class="domain-catalog">
-        <MediaCatalogNavigation />
+        {mediaCollections.map((collection) => (
+          <CatalogSection
+            title={collection.title}
+            collections={[collection]}
+          />
+        ))}
       </div>
     </section>
 
