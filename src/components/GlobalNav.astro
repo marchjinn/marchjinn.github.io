@@ -20,10 +20,7 @@ const domains = [
             aria-pressed={domain.id === "music" ? "true" : "false"}
           >
             <span class="global-nav__item-label">{domain.label}</span>
-            <span
-              class="global-nav__item-indicator"
-              aria-hidden="true"
-            ></span>
+            <span class="global-nav__item-indicator" aria-hidden="true"></span>
           </button>
         ))}
       </div>
@@ -40,6 +37,29 @@ const domains = [
 </nav>
 
 <script>
+  function syncActiveDomain() {
+    const path = window.location.pathname;
+
+    const isMusic =
+      path === "/" ||
+      path.startsWith("/music/") ||
+      path.startsWith("/zillion/");
+
+    const activeDomain = isMusic ? "music" : "media";
+
+    document.querySelectorAll<HTMLButtonElement>("[data-domain]").forEach(
+      (button) => {
+        const active = button.dataset.domain === activeDomain;
+
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      }
+    );
+  }
+
+  document.addEventListener("astro:page-load", syncActiveDomain);
+  syncActiveDomain();
+
   document.addEventListener("click", (event) => {
     const target = event.target;
 
@@ -53,7 +73,6 @@ const domains = [
 
     if (!selectedDomain) return;
 
-    // On the root page, switch domains without changing the URL.
     if (window.location.pathname === "/") {
       window.dispatchEvent(
         new CustomEvent("marchjinn:domain-change", {
@@ -61,10 +80,10 @@ const domains = [
         })
       );
 
+      syncActiveDomain();
       return;
     }
 
-    // From a category or domain page, return to the selected domain.
     const destination =
       selectedDomain === "media" ? "/media/" : "/";
 
