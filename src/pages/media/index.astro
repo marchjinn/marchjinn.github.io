@@ -1,9 +1,20 @@
 ---
 import SiteLayout from "../../layouts/SiteLayout.astro";
+import MediaCatalogNavigation from "../../components/MediaCatalogNavigation.astro";
 ---
-<SiteLayout title="Media" description="Media featuring and created by March Jinn.">
-  <section class="domain-page" aria-labelledby="page-title">
-    <p class="eyebrow">March Jinn / Domain 02</p>
-    <h1 id="page-title">Media</h1>
+
+<SiteLayout
+  title="Media"
+  description="Videos, photos, audio, streams and publications featuring March Jinn."
+>
+  <section class="domain-page media-page" aria-labelledby="page-title">
+    <header class="domain-heading">
+      <p class="eyebrow">March Jinn / Domain 02</p>
+      <h1 id="page-title">Media</h1>
+    </header>
+
+    <div class="domain-catalog">
+      <MediaCatalogNavigation />
+    </div>
   </section>
 </SiteLayout>
