@@ -1,0 +1,151 @@
+---
+import type { MediaItem } from "../content/media";
+
+interface Props {
+  item: MediaItem;
+  embedUrl?: string;
+}
+
+const { item, embedUrl } = Astro.props;
+
+const dateLabel = item.publishedAt
+  ? new Date(item.publishedAt).getFullYear()
+  : undefined;
+---
+
+<article class="catalog-card media-card">
+  <div class="catalog-card__media">
+    {item.thumbnail ? (
+      <img
+        src={item.thumbnail}
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <span class="catalog-card__placeholder"></span>
+    )}
+
+    <div class="media-card__player" data-media-player hidden></div>
+  </div>
+
+  <div class="catalog-card__information">
+    <span class="catalog-card__title">{item.title}</span>
+
+    {dateLabel && (
+      <span class="catalog-card__year">{dateLabel}</span>
+    )}
+
+    {embedUrl ? (
+      <button
+        class="text-link media-card__action"
+        type="button"
+        data-media-play
+        data-embed-url={embedUrl}
+        data-title={item.title}
+        aria-expanded="false"
+      >
+        Play
+      </button>
+    ) : (
+      <a
+        class="text-link media-card__action"
+        href={item.sourceUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open original
+      </a>
+    )}
+
+    <a
+      class="media-card__source"
+      href={item.sourceUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Original source ↗
+    </a>
+  </div>
+</article>
+
+<script>
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+
+    if (!(target instanceof Element)) return;
+
+    const button = target.closest<HTMLButtonElement>("[data-media-play]");
+
+    if (!button) return;
+
+    const embedUrl = button.dataset.embedUrl;
+    const card = button.closest<HTMLElement>(".media-card");
+    const player = card?.querySelector<HTMLElement>("[data-media-player]");
+
+    if (!embedUrl || !player || player.querySelector("iframe")) return;
+
+    const iframe = document.createElement("iframe");
+
+    iframe.src = embedUrl;
+    iframe.title = button.dataset.title || "March Jinn media player";
+    iframe.allow =
+      "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    iframe.allowFullscreen = true;
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.position = "absolute";
+    iframe.style.inset = "0";
+    iframe.style.border = "0";
+
+    player.hidden = false;
+    player.appendChild(iframe);
+
+    button.setAttribute("aria-expanded", "true");
+    button.textContent = "Playing";
+    button.disabled = true;
+  });
+</script>
+
+<style>
+  .media-card {
+    min-width: 0;
+  }
+
+  .media-card__player {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .media-card__action {
+    width: fit-content;
+    margin-top: 7px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .media-card__action:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .media-card__source {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 3px;
+    color: var(--color-tertiary);
+    font-size: 11px;
+    transition: color var(--transition-fast);
+  }
+
+  .media-card__source:hover {
+    color: var(--color-primary);
+  }
+</style>
