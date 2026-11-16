@@ -1,6 +1,10 @@
+
 ---
 import SiteLayout from "../../layouts/SiteLayout.astro";
-import MediaCatalogNavigation from "../../components/MediaCatalogNavigation.astro";
+import CatalogSection from "../../components/CatalogSection.astro";
+import { getMediaCatalogCollections } from "../../content/media";
+
+const collections = getMediaCatalogCollections();
 ---
 
 <SiteLayout
@@ -14,7 +18,10 @@ import MediaCatalogNavigation from "../../components/MediaCatalogNavigation.astr
     </header>
 
     <div class="domain-catalog">
-      <MediaCatalogNavigation />
+      <CatalogSection
+        title="Media"
+        collections={collections}
+      />
     </div>
   </section>
 </SiteLayout>
