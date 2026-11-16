@@ -76,6 +76,13 @@ const mediaCollections = getMediaCatalogCollections();
   </div>
 
   <script>
+    type Domain = "music" | "media";
+
+    const SCROLL_KEYS: Record<Domain, string> = {
+      music: "marchjinn-scroll-music",
+      media: "marchjinn-scroll-media"
+    };
+
     function getPanels() {
       return Array.from(
         document.querySelectorAll<HTMLElement>("[data-domain-panel]")
@@ -88,7 +95,60 @@ const mediaCollections = getMediaCatalogCollections();
       );
     }
 
-    function renderDomain(domain: string) {
+    function getActiveDomain(): Domain {
+      const visiblePanel = getPanels().find(
+        (panel) => !panel.hidden
+      );
+
+      return visiblePanel?.dataset.domainPanel === "media"
+        ? "media"
+        : "music";
+    }
+
+    function isDomain(value: unknown): value is Domain {
+      return value === "music" || value === "media";
+    }
+
+    function saveScrollPosition(domain: Domain) {
+      try {
+        sessionStorage.setItem(
+          SCROLL_KEYS[domain],
+          String(window.scrollY)
+        );
+      } catch {
+        // Scroll restoration remains optional.
+      }
+    }
+
+    function getSavedScrollPosition(domain: Domain): number {
+      try {
+        const savedPosition = Number(
+          sessionStorage.getItem(SCROLL_KEYS[domain])
+        );
+
+        return Number.isFinite(savedPosition) && savedPosition > 0
+          ? savedPosition
+          : 0;
+      } catch {
+        return 0;
+      }
+    }
+
+    function restoreScrollPosition(domain: Domain) {
+      const savedPosition = getSavedScrollPosition(domain);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: savedPosition,
+            left: 0,
+            behavior: "instant"
+          });
+        });
+      });
+    }
+
+    function renderDomain(domain: Domain) {
       const panels = getPanels();
 
       const target = panels.find(
@@ -111,15 +171,25 @@ const mediaCollections = getMediaCatalogCollections();
       document.title =
         domain === "music"
           ? "March Jinn"
-          : `${domain.charAt(0).toUpperCase()}${domain.slice(1)} — March Jinn`;
+          : "Media — March Jinn";
     }
 
-    function selectDomain(domain: string, updateHistory = true) {
+    function selectDomain(
+      domain: Domain,
+      updateHistory = true
+    ) {
       if (!getPanels().some(
         (panel) => panel.dataset.domainPanel === domain
       )) {
         return;
       }
+
+      const currentDomain = getActiveDomain();
+
+      if (currentDomain === domain) return;
+
+      // Save the outgoing domain before hiding it.
+      saveScrollPosition(currentDomain);
 
       renderDomain(domain);
 
@@ -136,14 +206,22 @@ const mediaCollections = getMediaCatalogCollections();
           window.location.pathname
         );
       }
+
+      // Restore the destination domain's independent position.
+      restoreScrollPosition(domain);
     }
 
     function initializeDomain() {
       const panels = getPanels();
 
-      if (panels.length === 0) return;
+      if (
+        panels.length === 0 ||
+        window.location.pathname !== "/"
+      ) {
+        return;
+      }
 
-      let initialDomain = "music";
+      let initialDomain: unknown = "music";
 
       try {
         initialDomain =
@@ -154,9 +232,7 @@ const mediaCollections = getMediaCatalogCollections();
         initialDomain = history.state?.domain || "music";
       }
 
-      if (!panels.some(
-        (panel) => panel.dataset.domainPanel === initialDomain
-      )) {
+      if (!isDomain(initialDomain)) {
         initialDomain = "music";
       }
 
@@ -167,16 +243,39 @@ const mediaCollections = getMediaCatalogCollections();
         "",
         window.location.pathname
       );
+
+      restoreScrollPosition(initialDomain);
     }
+
+    // Save the active domain's position while the user scrolls.
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.location.pathname !== "/") return;
+
+        saveScrollPosition(getActiveDomain());
+      },
+      { passive: true }
+    );
+
+    // Save once more when leaving the page.
+    window.addEventListener("pagehide", () => {
+      if (window.location.pathname !== "/") return;
+
+      saveScrollPosition(getActiveDomain());
+    });
 
     window.addEventListener("marchjinn:domain-change", (event) => {
       const customEvent = event as CustomEvent<{ domain: string }>;
+      const domain = customEvent.detail.domain;
 
-      selectDomain(customEvent.detail.domain);
+      if (isDomain(domain)) {
+        selectDomain(domain);
+      }
     });
 
     window.addEventListener("popstate", (event) => {
-      let fallbackDomain = "music";
+      let fallbackDomain: unknown = "music";
 
       try {
         fallbackDomain =
@@ -185,10 +284,19 @@ const mediaCollections = getMediaCatalogCollections();
         // Use Music as the default domain.
       }
 
-      selectDomain(event.state?.domain || fallbackDomain, false);
+      const domain = isDomain(event.state?.domain)
+        ? event.state.domain
+        : isDomain(fallbackDomain)
+          ? fallbackDomain
+          : "music";
+
+      selectDomain(domain, false);
     });
 
-    document.addEventListener("astro:page-load", initializeDomain);
+    document.addEventListener(
+      "astro:page-load",
+      initializeDomain
+    );
 
     initializeDomain();
   </script>
