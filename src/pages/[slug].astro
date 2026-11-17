@@ -156,7 +156,27 @@ const playerSources = item?.playerSources ?? [];
 const providerLabels: Record<MusicPlayerProvider, string> = {
   "apple-music": "Apple Music",
   spotify: "Spotify",
-  tidal: "TIDAL"
+  "amazon-music": "Amazon Music",
+  soundcloud: "SoundCloud",
+  tidal: "TIDAL",
+  deezer: "Deezer",
+  bandcamp: "Bandcamp",
+  audiomack: "Audiomack"
+};
+
+/**
+ * Temporary typographic marks.
+ * Replace with official platform SVG assets later.
+ */
+const providerMarks: Record<MusicPlayerProvider, string> = {
+  "apple-music": "♪",
+  spotify: "◉",
+  "amazon-music": "a",
+  soundcloud: "☁",
+  tidal: "◆",
+  deezer: "▥",
+  bandcamp: "b",
+  audiomack: "A"
 };
 
 const youtubeEmbedUrl = getYouTubePlaylistEmbedUrl(
@@ -165,6 +185,8 @@ const youtubeEmbedUrl = getYouTubePlaylistEmbedUrl(
 
 const releaseIsUpcoming =
   item?.releaseStatus === "upcoming";
+
+const externalLinks = item?.externalLinks ?? [];
 ---
 
 <SiteLayout
@@ -289,7 +311,16 @@ const releaseIsUpcoming =
                   data-player-tab={source.provider}
                   aria-pressed={index === 0 ? "true" : "false"}
                 >
-                  {providerLabels[source.provider]}
+                  <span
+                    class="music-player__tab-mark"
+                    aria-hidden="true"
+                  >
+                    {providerMarks[source.provider]}
+                  </span>
+
+                  <span class="music-player__tab-label">
+                    {providerLabels[source.provider]}
+                  </span>
                 </button>
               ))}
             </div>
@@ -304,7 +335,7 @@ const releaseIsUpcoming =
                   <iframe
                     src={source.url}
                     title={`${item.title} on ${providerLabels[source.provider]}`}
-                    loading="lazy"
+                    loading={index === 0 ? "eager" : "lazy"}
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     referrerpolicy="strict-origin-when-cross-origin"
                   />
@@ -372,6 +403,33 @@ const releaseIsUpcoming =
         )}
       </section>
 
+      <!-- Listen On -->
+      {externalLinks.length > 0 && (
+        <section
+          class="entry-page__section listen-on"
+          aria-labelledby="listen-on-title"
+        >
+          <h2 id="listen-on-title">Listen On</h2>
+
+          <nav
+            class="listen-on__links"
+            aria-label="Listen on external platforms"
+          >
+            {externalLinks.map((link) => (
+              <a
+                class="listen-on__link"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>{link.platform}</span>
+                <span class="listen-on__arrow" aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </nav>
+        </section>
+      )}
+
       {item.tracks && item.tracks.length > 0 && (
         <section class="entry-page__section">
           <h2>Tracklist</h2>
@@ -424,21 +482,6 @@ const releaseIsUpcoming =
           </ul>
         </section>
       )}
-
-      {item.externalLinks && item.externalLinks.length > 0 && (
-        <nav class="entry-page__links" aria-label="External links">
-          {item.externalLinks.map((link) => (
-            <a
-              class="text-link"
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {link.platform}
-            </a>
-          ))}
-        </nav>
-      )}
     </section>
   ) : null}
 </SiteLayout>
@@ -476,6 +519,12 @@ const releaseIsUpcoming =
           layers.forEach((layer) => {
             layer.hidden =
               layer.dataset.playerLayer !== selectedProvider;
+          });
+
+          tab.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center"
           });
         });
       });
@@ -550,44 +599,98 @@ const releaseIsUpcoming =
     text-transform: uppercase;
   }
 
+  /* Universal Music Player tabs */
+
   .music-player__tabs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: clamp(12px, 2vw, 28px);
+    width: 100%;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .music-player__tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .music-player__tab {
-    min-height: 40px;
-    padding: 0 16px;
-    border: 1px solid var(--color-border, #333);
-    border-radius: 8px;
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 0 2px 9px;
+    border: 0;
+    border-radius: 0;
     background: transparent;
     color: var(--color-text-muted, #999);
     font: inherit;
-    font-size: 13px;
+    font-size: 12px;
+    white-space: nowrap;
     cursor: pointer;
+    transition: color 160ms ease;
+  }
+
+  .music-player__tab::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+    content: "";
+    opacity: 0;
+    transform: scaleX(0.5);
+    transform-origin: center;
     transition:
-      color 160ms ease,
-      background 160ms ease,
-      border-color 160ms ease;
+      opacity 160ms ease,
+      transform 160ms ease;
   }
 
   .music-player__tab:hover {
     color: var(--color-text, #fff);
-    border-color: var(--color-text-muted, #999);
   }
 
   .music-player__tab.is-active {
-    color: var(--color-background, #080808);
-    background: var(--color-text, #fff);
-    border-color: var(--color-text, #fff);
+    color: var(--color-text, #fff);
   }
+
+  .music-player__tab.is-active::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .music-player__tab-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .music-player__tab-label {
+    font-size: 12px;
+    letter-spacing: 0.01em;
+  }
+
+  /* Player frame */
 
   .music-player__frame {
     position: relative;
     width: 100%;
-    height: 560px;
+    max-width: 960px;
+    height: 500px;
+    margin-inline: auto;
     overflow: hidden;
     border-radius: 12px;
     background: var(--color-surface, #111);
@@ -633,6 +736,8 @@ const releaseIsUpcoming =
     line-height: 1.6;
   }
 
+  /* YouTube Album Player */
+
   .youtube-album__heading {
     align-items: flex-end;
   }
@@ -644,7 +749,9 @@ const releaseIsUpcoming =
   .youtube-album__frame {
     position: relative;
     width: 100%;
+    max-width: 960px;
     aspect-ratio: 16 / 9;
+    margin-inline: auto;
     overflow: hidden;
     border-radius: 12px;
     background: #111;
@@ -664,19 +771,62 @@ const releaseIsUpcoming =
     margin-top: 16px;
   }
 
+  /* Listen On */
+
+  .listen-on__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
+  }
+
+  .listen-on__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--color-text-muted, #999);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 160ms ease;
+  }
+
+  .listen-on__link:hover {
+    color: var(--color-text, #fff);
+  }
+
+  .listen-on__arrow {
+    font-size: 12px;
+    opacity: 0.65;
+  }
+
+  @media (min-width: 1024px) {
+    .music-player__tabs {
+      justify-content: flex-start;
+      gap: clamp(16px, 2.2vw, 32px);
+    }
+  }
+
   @media (max-width: 639px) {
     .music-player__frame {
-      height: 560px;
+      height: 500px;
+      border-radius: 8px;
     }
 
     .music-player__tab {
-      flex: 1 1 auto;
-      padding: 0 12px;
+      min-height: 42px;
     }
 
     .music-player__heading,
     .youtube-album__heading {
       align-items: flex-start;
+    }
+
+    .youtube-album__frame {
+      border-radius: 8px;
+    }
+
+    .listen-on__links {
+      gap: 14px 20px;
     }
   }
 </style>
