@@ -170,11 +170,15 @@ export const musicItems: MusicItem[] = [
       }
     ],
 
-    // Temporary Apple Music embed test.
+    // Temporary Apple Music and Spotify embed tests.
     playerSources: [
       {
         provider: "apple-music",
         url: "https://embed.music.apple.com/us/album/stop-staring-at-the-shadows/1551171660"
+      },
+      {
+        provider: "spotify",
+        url: "https://open.spotify.com/embed/album/7rKmLxCFlmtIxGpX4HYgs4"
       }
     ]
   }
