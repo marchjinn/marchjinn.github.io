@@ -14,6 +14,13 @@ export type MusicCategory =
 
 export type MusicStatus = "draft" | "published";
 
+export type MusicReleaseStatus = "upcoming" | "available";
+
+export type MusicPlayerProvider =
+  | "apple-music"
+  | "spotify"
+  | "tidal";
+
 export interface MusicPlacement {
   section: MusicSection;
   category: MusicCategory;
@@ -21,6 +28,11 @@ export interface MusicPlacement {
 
 export interface MusicExternalLink {
   platform: string;
+  url: string;
+}
+
+export interface MusicPlayerSource {
+  provider: MusicPlayerProvider;
   url: string;
 }
 
@@ -51,6 +63,8 @@ export interface MusicItem {
   status: MusicStatus;
   placements: MusicPlacement[];
 
+  releaseStatus?: MusicReleaseStatus;
+
   image?: string;
   date?: string;
   description?: string;
@@ -62,6 +76,11 @@ export interface MusicItem {
   artists?: string[];
   credits?: MusicCredit[];
   tracks?: MusicTrack[];
+
+  playerSources?: MusicPlayerSource[];
+
+  youtubePlaylistUrl?: string;
+  youtubePlaylistThumbnail?: string;
 
   events?: MusicEvent[];
 
@@ -135,13 +154,19 @@ export const musicItems: MusicItem[] = [
     id: "zillion",
     slug: "zillion",
     title: "Zillion",
+
     status: "published",
+    releaseStatus: "upcoming",
+
     placements: [
       {
         section: "Releases",
         category: "Albums"
       }
     ]
+
+    // Add release information and platform URLs here
+    // when they become available.
   }
 ];
 
