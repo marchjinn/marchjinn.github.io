@@ -170,7 +170,7 @@ export const musicItems: MusicItem[] = [
       }
     ],
 
-    // Temporary Apple Music and Spotify embed tests.
+    // Temporary embed tests for supported music platforms.
     playerSources: [
       {
         provider: "apple-music",
@@ -179,6 +179,10 @@ export const musicItems: MusicItem[] = [
       {
         provider: "spotify",
         url: "https://open.spotify.com/embed/album/7rKmLxCFlmtIxGpX4HYgs4"
+      },
+      {
+        provider: "amazon-music",
+        url: "https://music.amazon.com/embed/B08V9H6MT3"
       }
     ]
   }
