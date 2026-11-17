@@ -170,7 +170,7 @@ export const musicItems: MusicItem[] = [
       }
     ],
 
-    // Temporary embed tests for supported music platforms.
+    // Temporary embed tests using the same reference album.
     playerSources: [
       {
         provider: "apple-music",
@@ -183,6 +183,62 @@ export const musicItems: MusicItem[] = [
       {
         provider: "amazon-music",
         url: "https://music.amazon.com/embed/B08V9H6MT3"
+      },
+      {
+        provider: "soundcloud",
+        url: "https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fg59%2Fsets%2Fstopstaringattheshadows&color=%23ffffff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"
+      },
+      {
+        provider: "tidal",
+        url: "https://embed.tidal.com/albums/171430481"
+      },
+      {
+        provider: "deezer",
+        url: "https://widget.deezer.com/widget/dark/album/203484852"
+      },
+      {
+        provider: "audiomack",
+        url: "https://audiomack.com/embed/album/suicide-boys/stop-staring-at-the-shadows"
+      }
+    ],
+
+    // Separate YouTube Album Player test.
+    youtubePlaylistUrl:
+      "https://music.youtube.com/playlist?list=OLAK5uy_m_YN4jRxFY1FrpJtDBF6kOewAz6G9tTqY",
+
+    // External listening destinations.
+    externalLinks: [
+      {
+        platform: "Apple Music",
+        url: "https://music.apple.com/us/album/stop-staring-at-the-shadows/1551171660"
+      },
+      {
+        platform: "Spotify",
+        url: "https://open.spotify.com/album/7rKmLxCFlmtIxGpX4HYgs4"
+      },
+      {
+        platform: "Amazon Music",
+        url: "https://music.amazon.com/albums/B08V9H6MT3"
+      },
+      {
+        platform: "SoundCloud",
+        url: "https://soundcloud.com/g59/sets/stopstaringattheshadows"
+      },
+      {
+        platform: "TIDAL",
+        url: "https://tidal.com/album/171430481"
+      },
+      {
+        platform: "Deezer",
+        url: "https://www.deezer.com/album/203484852"
+      },
+      {
+        platform: "Audiomack",
+        url: "https://audiomack.com/suicide-boys/album/stop-staring-at-the-shadows"
+      },
+      {
+        platform: "YouTube Music",
+        url: "https://music.youtube.com/playlist?list=OLAK5uy_m_YN4jRxFY1FrpJtDBF6kOewAz6G9tTqY"
       }
     ]
   }
