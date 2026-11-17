@@ -19,7 +19,12 @@ export type MusicReleaseStatus = "upcoming" | "available";
 export type MusicPlayerProvider =
   | "apple-music"
   | "spotify"
-  | "tidal";
+  | "amazon-music"
+  | "soundcloud"
+  | "tidal"
+  | "deezer"
+  | "bandcamp"
+  | "audiomack";
 
 export interface MusicPlacement {
   section: MusicSection;
