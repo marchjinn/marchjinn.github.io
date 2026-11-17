@@ -168,10 +168,15 @@ export const musicItems: MusicItem[] = [
         section: "Releases",
         category: "Albums"
       }
-    ]
+    ],
 
-    // Add release information and platform URLs here
-    // when they become available.
+    // Temporary Apple Music embed test.
+    playerSources: [
+      {
+        provider: "apple-music",
+        url: "https://embed.music.apple.com/us/album/stop-staring-at-the-shadows/1551171660"
+      }
+    ]
   }
 ];
 
