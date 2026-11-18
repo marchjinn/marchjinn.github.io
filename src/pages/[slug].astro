@@ -279,6 +279,33 @@ const externalLinks = item?.externalLinks ?? [];
         </div>
       )}
 
+      <!-- Listen On: external streaming platforms -->
+      {externalLinks.length > 0 && (
+        <section
+          class="entry-page__section listen-on"
+          aria-labelledby="listen-on-title"
+        >
+          <h2 id="listen-on-title">Listen On</h2>
+
+          <nav
+            class="listen-on__links"
+            aria-label="Listen on external platforms"
+          >
+            {externalLinks.map((link) => (
+              <a
+                class="listen-on__link"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>{link.platform}</span>
+                <span class="listen-on__arrow" aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </nav>
+        </section>
+      )}
+
       <!-- Universal Music Player -->
       <section
         class="entry-page__section music-player"
@@ -402,33 +429,6 @@ const externalLinks = item?.externalLinks ?? [];
           </a>
         )}
       </section>
-
-      <!-- Listen On -->
-      {externalLinks.length > 0 && (
-        <section
-          class="entry-page__section listen-on"
-          aria-labelledby="listen-on-title"
-        >
-          <h2 id="listen-on-title">Listen On</h2>
-
-          <nav
-            class="listen-on__links"
-            aria-label="Listen on external platforms"
-          >
-            {externalLinks.map((link) => (
-              <a
-                class="listen-on__link"
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>{link.platform}</span>
-                <span class="listen-on__arrow" aria-hidden="true">↗</span>
-              </a>
-            ))}
-          </nav>
-        </section>
-      )}
 
       {item.tracks && item.tracks.length > 0 && (
         <section class="entry-page__section">
