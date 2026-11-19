@@ -31,7 +31,23 @@ const domains = [
         href="/"
         aria-label="March Jinn — Main environment"
       >
-        <span class="global-nav__brand-mark" aria-hidden="true">FJ</span>
+        <img
+          class="global-nav__brand-mark global-nav__brand-mark--light"
+          src="/images/fire-jinn-white.svg"
+          alt=""
+          aria-hidden="true"
+          width="1000"
+          height="1000"
+        />
+
+        <img
+          class="global-nav__brand-mark global-nav__brand-mark--dark"
+          src="/images/fire-jinn-black.svg"
+          alt=""
+          aria-hidden="true"
+          width="1000"
+          height="1000"
+        />
       </a>
     </div>
   </div>
@@ -173,3 +189,26 @@ const domains = [
     }
   });
 </script>
+
+<style>
+  .global-nav__brand-mark {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .global-nav__brand-mark--dark {
+    display: none;
+  }
+
+  /* Switch to the black logo in Light Mode. */
+
+  :global(html[data-theme="light"]) .global-nav__brand-mark--light {
+    display: none;
+  }
+
+  :global(html[data-theme="light"]) .global-nav__brand-mark--dark {
+    display: block;
+  }
+</style>
