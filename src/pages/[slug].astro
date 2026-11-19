@@ -170,19 +170,67 @@ const providerLabels: Record<MusicPlayerProvider, string> = {
 };
 
 /**
- * Temporary typographic marks.
- * Replace with official platform SVG assets later.
+ * Font Awesome 6 platform icons.
+ *
+ * Audiomack uses a neutral Font Awesome icon because
+ * a dedicated Audiomack brand icon is not included
+ * in the selected Font Awesome set.
  */
-const providerMarks: Record<MusicPlayerProvider, string> = {
-  "apple-music": "♪",
-  spotify: "◉",
-  "amazon-music": "a",
-  soundcloud: "☁",
-  tidal: "◆",
-  deezer: "▥",
-  bandcamp: "b",
-  audiomack: "A"
+const providerIcons: Record<MusicPlayerProvider, string> = {
+  "apple-music": "fa-brands fa-apple",
+  spotify: "fa-brands fa-spotify",
+  "amazon-music": "fa-brands fa-amazon",
+  soundcloud: "fa-brands fa-soundcloud",
+  tidal: "fa-brands fa-tidal",
+  deezer: "fa-brands fa-deezer",
+  bandcamp: "fa-brands fa-bandcamp",
+  audiomack: "fa-solid fa-headphones"
 };
+
+/**
+ * Resolves Font Awesome icons for external Listen On links.
+ */
+function getPlatformIconClass(platform: string): string {
+  const normalized = platform.toLowerCase().trim();
+
+  if (normalized.includes("apple")) {
+    return "fa-brands fa-apple";
+  }
+
+  if (normalized.includes("spotify")) {
+    return "fa-brands fa-spotify";
+  }
+
+  if (normalized.includes("amazon")) {
+    return "fa-brands fa-amazon";
+  }
+
+  if (normalized.includes("soundcloud")) {
+    return "fa-brands fa-soundcloud";
+  }
+
+  if (normalized.includes("tidal")) {
+    return "fa-brands fa-tidal";
+  }
+
+  if (normalized.includes("deezer")) {
+    return "fa-brands fa-deezer";
+  }
+
+  if (normalized.includes("bandcamp")) {
+    return "fa-brands fa-bandcamp";
+  }
+
+  if (normalized.includes("audiomack")) {
+    return "fa-solid fa-headphones";
+  }
+
+  if (normalized.includes("youtube")) {
+    return "fa-brands fa-youtube";
+  }
+
+  return "fa-solid fa-music";
+}
 
 const youtubeEmbedUrl = getYouTubePlaylistEmbedUrl(
   item?.youtubePlaylistUrl
@@ -303,6 +351,13 @@ const externalLinks = item?.externalLinks ?? [];
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <i
+                  class:list={[
+                    "listen-on__icon",
+                    getPlatformIconClass(link.platform)
+                  ]}
+                  aria-hidden="true"
+                />
                 <span>{link.platform}</span>
                 <span class="listen-on__arrow" aria-hidden="true">↗</span>
               </a>
@@ -343,12 +398,13 @@ const externalLinks = item?.externalLinks ?? [];
                   data-player-tab={source.provider}
                   aria-pressed={index === 0 ? "true" : "false"}
                 >
-                  <span
-                    class="music-player__tab-mark"
+                  <i
+                    class:list={[
+                      "music-player__tab-icon",
+                      providerIcons[source.provider]
+                    ]}
                     aria-hidden="true"
-                  >
-                    {providerMarks[source.provider]}
-                  </span>
+                  />
 
                   <span class="music-player__tab-label">
                     {providerLabels[source.provider]}
@@ -400,6 +456,7 @@ const externalLinks = item?.externalLinks ?? [];
           </div>
 
           <span class="youtube-album__label">
+            <i class="fa-brands fa-youtube" aria-hidden="true" />
             YouTube
           </span>
         </div>
@@ -545,6 +602,8 @@ const externalLinks = item?.externalLinks ?? [];
 </script>
 
 <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css");
+
   .media-category-collection {
     margin-top: clamp(72px, 10vw, 120px);
   }
@@ -598,6 +657,9 @@ const externalLinks = item?.externalLinks ?? [];
 
   .music-player__status,
   .youtube-album__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     color: var(--color-text-muted, #999);
     font-size: 12px;
     letter-spacing: 0.08em;
@@ -630,7 +692,7 @@ const externalLinks = item?.externalLinks ?? [];
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 8px;
     min-height: 42px;
     padding: 0 2px 9px;
     border: 0;
@@ -673,14 +735,15 @@ const externalLinks = item?.externalLinks ?? [];
     transform: scaleX(1);
   }
 
-  .music-player__tab-mark {
+  .music-player__tab-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 15px;
-    font-size: 16px;
-    font-weight: 600;
+    width: 17px;
+    min-width: 17px;
+    font-size: 15px;
     line-height: 1;
+    text-align: center;
   }
 
   .music-player__tab-label {
@@ -788,7 +851,7 @@ const externalLinks = item?.externalLinks ?? [];
   .listen-on__link {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     color: var(--color-text-muted, #999);
     font-size: 13px;
     text-decoration: none;
@@ -797,6 +860,17 @@ const externalLinks = item?.externalLinks ?? [];
 
   .listen-on__link:hover {
     color: var(--color-text, #fff);
+  }
+
+  .listen-on__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    min-width: 17px;
+    font-size: 15px;
+    line-height: 1;
+    text-align: center;
   }
 
   .listen-on__arrow {
