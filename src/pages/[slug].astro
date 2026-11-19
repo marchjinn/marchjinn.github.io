@@ -125,27 +125,32 @@ const pageDescription = category
   : item!.description ?? `${item!.title} — March Jinn.`;
 
 /**
- * Converts a regular YouTube playlist URL into
- * the privacy-enhanced YouTube playlist embed URL.
+ * Builds the official YouTube embedded playlist URL.
+ *
+ * YouTube's native embedded player handles playlist
+ * navigation and track selection.
  */
 function getYouTubePlaylistEmbedUrl(url?: string): string | undefined {
   if (!url) return undefined;
 
   try {
     const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
 
-    if (
-      parsedUrl.hostname.includes("youtube.com") &&
-      parsedUrl.pathname.includes("/embed/videoseries")
-    ) {
-      return url;
-    }
+    const isYouTube =
+      hostname === "youtube.com" ||
+      hostname.endsWith(".youtube.com") ||
+      hostname === "youtube-nocookie.com" ||
+      hostname.endsWith(".youtube-nocookie.com") ||
+      hostname === "youtu.be";
+
+    if (!isYouTube) return undefined;
 
     const playlistId = parsedUrl.searchParams.get("list");
 
     if (!playlistId) return undefined;
 
-    return `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(playlistId)}`;
+    return `https://www.youtube.com/embed?listType=playlist&list=${encodeURIComponent(playlistId)}`;
   } catch {
     return undefined;
   }
@@ -405,7 +410,7 @@ const externalLinks = item?.externalLinks ?? [];
               src={youtubeEmbedUrl}
               title={`${item.title} — Official Album Playlist`}
               loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; web-share"
               allowfullscreen
               referrerpolicy="strict-origin-when-cross-origin"
             />
