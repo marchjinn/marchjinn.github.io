@@ -27,13 +27,29 @@ const canonicalUrl = `https://marchjinn.com${Astro.url.pathname}`;
     <meta name="description" content={description} />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="March Jinn" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
 
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/images/march-jinn-logo-black.svg"
+    />
+
     <link rel="canonical" href={canonicalUrl} />
 
     <title>{pageTitle}</title>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "March Jinn",
+        "url": "https://marchjinn.com/"
+      }
+    </script>
 
     <ClientRouter />
   </head>
