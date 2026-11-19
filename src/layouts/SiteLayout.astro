@@ -10,12 +10,10 @@ interface Props {
 }
 
 const {
-  title,
   description = "March Jinn Official Website"
 } = Astro.props;
 
-const pageTitle =
-  title === "March Jinn" ? title : `${title} — March Jinn`;
+const pageTitle = "March Jinn";
 
 const canonicalUrl = `https://marchjinn.com${Astro.url.pathname}`;
 ---
