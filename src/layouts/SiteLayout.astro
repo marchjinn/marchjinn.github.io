@@ -2,6 +2,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
 import GlobalNav from "../components/GlobalNav.astro";
+import { identity } from "../data/identity";
 import "../styles/global.css";
 
 interface Props {
@@ -10,12 +11,26 @@ interface Props {
 }
 
 const {
-  description = "March Jinn Official Website"
+  title,
+  description = identity.website.metaDescription,
 } = Astro.props;
 
-const pageTitle = "March Jinn";
+const pageTitle =
+  title === identity.name
+    ? identity.name
+    : `${title} — ${identity.name}`;
 
-const canonicalUrl = `https://marchjinn.com${Astro.url.pathname}`;
+const canonicalUrl = new URL(
+  Astro.url.pathname,
+  identity.website.url
+).href;
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: identity.name,
+  url: `${identity.website.url}/`,
+};
 ---
 
 <!doctype html>
@@ -27,7 +42,7 @@ const canonicalUrl = `https://marchjinn.com${Astro.url.pathname}`;
     <meta name="description" content={description} />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="March Jinn" />
+    <meta property="og:site_name" content={identity.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
@@ -42,14 +57,10 @@ const canonicalUrl = `https://marchjinn.com${Astro.url.pathname}`;
 
     <title>{pageTitle}</title>
 
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "March Jinn",
-        "url": "https://marchjinn.com/"
-      }
-    </script>
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(websiteSchema)}
+    />
 
     <ClientRouter />
   </head>
