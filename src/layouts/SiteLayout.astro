@@ -11,14 +11,10 @@ interface Props {
 }
 
 const {
-  title,
   description = identity.website.metaDescription,
 } = Astro.props;
 
-const pageTitle =
-  title === identity.name
-    ? identity.name
-    : `${title} — ${identity.name}`;
+const pageTitle = identity.name;
 
 const canonicalUrl = new URL(
   Astro.url.pathname,
