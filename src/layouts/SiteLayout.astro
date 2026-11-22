@@ -8,10 +8,18 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  noindex?: boolean;
+  socialImage?: string;
+  socialImageAlt?: string;
+  ogType?: "website" | "article";
 }
 
 const {
   description = identity.website.metaDescription,
+  noindex = false,
+  socialImage,
+  socialImageAlt = identity.name,
+  ogType = "website",
 } = Astro.props;
 
 const pageTitle = identity.name;
@@ -21,11 +29,21 @@ const canonicalUrl = new URL(
   identity.website.url
 ).href;
 
+const socialImageUrl = socialImage
+  ? new URL(socialImage, identity.website.url).href
+  : undefined;
+
+const robotsContent = noindex
+  ? "noindex, nofollow"
+  : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${identity.website.url}/#website`,
   name: identity.name,
   url: `${identity.website.url}/`,
+  inLanguage: "en",
 };
 ---
 
@@ -34,25 +52,63 @@ const websiteSchema = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#080808" />
+
+    <!-- Core identity -->
+    <title>{pageTitle}</title>
+    <meta name="application-name" content={identity.name} />
+    <meta name="author" content={identity.name} />
     <meta name="description" content={description} />
 
-    <meta property="og:type" content="website" />
+    <!-- Search engine directives -->
+    <meta name="robots" content={robotsContent} />
+    <meta name="googlebot" content={robotsContent} />
+
+    <!-- Browser and device metadata -->
+    <meta name="theme-color" content="#080808" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={identity.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content="en_US" />
 
+    {socialImageUrl && (
+      <>
+        <meta property="og:image" content={socialImageUrl} />
+        <meta property="og:image:alt" content={socialImageAlt} />
+      </>
+    )}
+
+    <!-- X Cards -->
+    <meta
+      name="twitter:card"
+      content={socialImageUrl ? "summary_large_image" : "summary"}
+    />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    {socialImageUrl && (
+      <>
+        <meta name="twitter:image" content={socialImageUrl} />
+        <meta name="twitter:image:alt" content={socialImageAlt} />
+      </>
+    )}
+
+    <!-- Favicon -->
     <link
       rel="icon"
       type="image/svg+xml"
       href="/images/march-jinn-logo-black.svg"
     />
 
-    <link rel="canonical" href={canonicalUrl} />
-
-    <title>{pageTitle}</title>
-
+    <!-- Structured Data -->
     <script
       type="application/ld+json"
       set:html={JSON.stringify(websiteSchema)}
