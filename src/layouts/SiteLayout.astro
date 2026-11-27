@@ -37,13 +37,31 @@ const robotsContent = noindex
   ? "noindex, nofollow"
   : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
-const websiteSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": `${identity.website.url}/#website`,
+const personSchema = {
+  "@type": "Person",
+  "@id": identity.entities.person,
   name: identity.name,
   url: `${identity.website.url}/`,
-  inLanguage: "en",
+  ...(identity.officialProfiles.length > 0
+    ? { sameAs: [...identity.officialProfiles] }
+    : {}),
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": identity.entities.website,
+      name: identity.name,
+      url: `${identity.website.url}/`,
+      inLanguage: "en",
+      publisher: {
+        "@id": identity.entities.person,
+      },
+    },
+    personSchema,
+  ],
 };
 ---
 
